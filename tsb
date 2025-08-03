@@ -1,0 +1,233 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "UNIQUE IQ",
+    Icon = "crown",
+    LoadingTitle = "tsb mango scripts",
+    LoadingSubtitle = "by emin",
+    ShowText = "open",
+    Theme = "Serenity",
+    ToggleUIKeybind = "K",
+    DisableRayfieldPrompts = false,
+    DisableBuildWarnings = false,
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "unique",
+        FileName = "unique"
+    },
+    Discord = {
+        Enabled = true,
+        Invite = "H8zXENRc",
+        RememberJoins = false
+    }
+})
+
+local Tab = Window:CreateTab("Traps/Dunks", "crown")
+local adrian = 10
+
+Tab:CreateToggle({
+    Name = "Tatsu Trap ||use the first move||",
+    CurrentValue = false,
+    Flag = "Toggle1",
+    Callback = function(Value)
+        if Value then
+            local Players = game:GetService("Players")
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local player = Players.LocalPlayer
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:WaitForChild("Humanoid")
+            local hrp = character:WaitForChild("HumanoidRootPart")
+            local Replication = ReplicatedStorage:WaitForChild("Replication")
+            local prison = Vector3.new(439.1, 439.5, -375.1)
+            local middle = Vector3.new(149.9, 440.8, 21.1)
+
+            Replication.OnClientEvent:Connect(function(data)
+                if typeof(data) == "table" and data.Name == "Crushing Pull" and data.Effect == "Cooldown" then
+                    task.wait(0.2)
+                    hrp.CFrame = CFrame.new(prison)
+                    task.wait(3)
+                    hrp.CFrame = CFrame.new(middle)
+                end
+            end)
+        end
+    end
+})
+
+Tab:CreateToggle({
+    Name = "WhirlWind Dunk ||toggle again if u die||",
+    CurrentValue = false,
+    Flag = "Toggle2",
+    Callback = function(Value)
+        if Value then
+            local Players = game:GetService("Players")
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local player = Players.LocalPlayer
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:WaitForChild("Humanoid")
+            local hrp = character:WaitForChild("HumanoidRootPart")
+            local Replication = ReplicatedStorage:WaitForChild("Replication")
+
+            Replication.OnClientEvent:Connect(function(data)
+                if typeof(data) == "table" and data.Name == "Lethal Whirlwind Stream" and data.Effect == "Cooldown" then
+                    task.wait(1)
+                    hrp.CFrame = hrp.CFrame + hrp.CFrame.UpVector * adrian
+                    humanoid.PlatformStand = true
+
+                    local duration = 1.5
+                    local start = tick()
+                    while tick() - start < duration do
+                        hrp.Velocity = Vector3.new(0, 0, 0)
+                        task.wait()
+                    end
+
+                    humanoid.PlatformStand = false
+                    hrp.CFrame = hrp.CFrame - hrp.CFrame.UpVector * adrian
+                end
+            end)
+        end
+    end
+})
+
+Tab:CreateSlider({
+    Name = "Dunk Height",
+    Range = {0, 1000},
+    Increment = 10,
+    Suffix = "Studs",
+    CurrentValue = adrian,
+    Flag = "Slider1",
+    Callback = function(Value)
+        adrian = Value
+    end
+})
+
+local Tab = Window:CreateTab("Misc", "moon-star")
+
+Tab:CreateToggle({
+	Name = "Safezone ||tp you to a safezone when hp below 20||",
+	CurrentValue = false,
+	Flag = "Toggle3",
+	Callback = function(Value)
+		local Players = game:GetService("Players")
+		local player = Players.LocalPlayer
+
+		local function setupSafezone(character)
+			local humanoid = character:WaitForChild("Humanoid")
+			local hrp = character:WaitForChild("HumanoidRootPart")
+
+			local part = Instance.new("Part")
+			part.Size = Vector3.new(500, 1, 500)
+			part.Color = Color3.fromRGB(157, 219, 246)
+			part.Anchored = true
+			part.Position = Vector3.new(0, 1000, 0)
+			part.CanCollide = true
+			part.Material = Enum.Material.Neon
+			part.Parent = workspace
+
+			local savedCFrame
+			local teleported = false
+
+			humanoid.HealthChanged:Connect(function(hp)
+				if hp <= 20 and not teleported then
+					savedCFrame = hrp.CFrame
+					hrp.CFrame = CFrame.new(part.Position) * CFrame.new(0, 5, 0)
+					task.wait(0.5)
+					hrp.CFrame = CFrame.new(part.Position) * CFrame.new(0, 5, 0)
+					task.wait(0.5)
+					hrp.CFrame = CFrame.new(part.Position) * CFrame.new(0, 5, 0)
+					teleported = true
+				elseif hp >= 40 and teleported then
+					if savedCFrame then
+						hrp.CFrame = savedCFrame
+						teleported = false
+					end
+				end
+			end)
+		end
+
+		if Value then
+			if player.Character then
+				setupSafezone(player.Character)
+			end
+			player.CharacterAdded:Connect(setupSafezone)
+		end
+	end
+})
+
+Tab:CreateToggle({
+	Name = "No CameraShake",
+	CurrentValue = false,
+	Flag = "Toggle4",
+	Callback = function(Value)
+	local RS = game:GetService("ReplicatedStorage")
+	
+	if Value == true then local camShakerModule = 		 RS:WaitForChild("Emotes"):WaitForChild("VFX"):WaitForChild("VfxMods"):WaitForChild("BlastClutch"):WaitForChild("library"):WaitForChild("CameraShaker")
+
+repeat task.wait() until camShakerModule:IsA("ModuleScript")
+
+local require = getrenv().require
+local CameraShaker = require(camShakerModule)
+
+
+CameraShaker.Shake = function() end
+CameraShaker.ShakeOnce = function() end
+CameraShaker.ShakeSustain = function() end
+CameraShaker.StartShake = function() end
+CameraShaker.Update = function() return CFrame.new() end
+
+local oldNew = CameraShaker.new
+CameraShaker.new = function(...)
+    local obj = oldNew(...)
+    obj._callback = function() end 
+    return obj
+end
+end
+end
+})
+
+		Tab:CreateToggle({
+	Name = "Inf Crushed Rock Var",
+	CurrentValue = false,
+	Flag = "Toggle5",
+	Callback = function(Value)
+		   if Value == true then
+			local Players = game:GetService("Players")
+			local plr = Players.LocalPlayer
+			local Character = plr.Character or plr.CharacterAdded:Wait()
+			local humanoid = Character:FindFirstChild("Humanoid")
+			local hrp = Character:FindFirstChild("HumanoidRootPart")
+			local ReplicatedStorage = game:GetService("ReplicatedStorage")
+			local Replication = ReplicatedStorage:WaitForChild("Replication")
+
+			local function teleportBehindRandom()
+				local others = {}
+				for _, player in pairs(Players:GetPlayers()) do
+					if player ~= plr and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+						table.insert(others, player)
+					end
+				end
+
+				if #others > 0 then
+					local target = others[math.random(1, #others)]
+					local targetHRP = target.Character.HumanoidRootPart
+					task.wait(delayTime)
+					local behind = targetHRP.CFrame * CFrame.new(0, 0, 3)
+					hrp.CFrame = CFrame.new(behind.Position, targetHRP.Position)
+				end
+			end
+
+			Replication.OnClientEvent:Connect(function(data)    
+				if typeof(data) == "table" then
+					if data.Name == "Dog Variant" and data.id == "rbxassetid://72451715583225" then
+					 task.wait(9)
+						teleportBehindRandom()
+					elseif data.Effect == "Smooth Grab" and data.From == hrp and data.Lerpspeed == 0.065 then
+					task.wait(2)
+						teleportBehindRandom()
+					end
+				end
+			end)
+		end
+	end
+})
+
+Rayfield:LoadConfiguration()
